@@ -1,70 +1,107 @@
-// ⚡ DOM SELECTORS — Connecting script logic to our layout visual nodes
+// ⚡ 1. DOM SELECTORS — Pinpointing our display layers
 const cartCountEl = document.getElementById('cart-count');
 const cartTotalEl = document.getElementById('cart-total');
 const productGrid = document.getElementById('product-grid');
 const checkoutBtn = document.getElementById('checkout-btn');
 
-// 📊 APPLICATION STATE — Keeping track of checkout calculations in active memory
-let cartCount = 0;
-let cartSubtotal = 0;
+// 📊 2. APPLICATION STATE — Track quantites using an Object map
+// This matches the 'data-id' attributes we put in our HTML file!
+const cartState = {
+    sneaker: { name: "Premium Canvas Sneaker", price: 350.00, quantity: 0 },
+    tee: { name: "Vintage Graphic Tee", price: 180.00, quantity: 0 }
+};
 
-// 🛠️ CORE LOGIC ENGINE — Processing product price details safely
-function handleAddToCart(event) {
-    // Escape early if what was clicked wasn't the correct action button
-    if (!event.target.classList.contains('add-to-cart-btn')) return;
+// 🎨 3. RENDER ENGINE — Redraws everything based on current memory numbers
+function renderUI() {
+    let totalItems = 0;
+    let totalCash = 0;
 
-    // Capture the contextual details from the specific product card parent container
-    const productCard = event.target.closest('.product-card');
-    const priceText = productCard.querySelector('.price').innerText;
+    // Loop through each item in our memory state
+    for (const key in cartState) {
+        const item = cartState[key];
+        totalItems += item.quantity;
+        totalCash += item.quantity * item.price;
 
-    // Strip currency tags to isolate clean numerical price strings (e.g., "GHS 350.00" -> 350.00)
-    const numericPrice = parseFloat(priceText.replace('GHS', '').trim());
+        // Update the tiny counter text inside the specific product card
+        // We find the specific card by searching for its unique data-id container
+        const card = document.querySelector(`[data-id="${key}"]`);
+        if (card) {
+            card.querySelector('.qty-count').innerText = item.quantity;
+        }
+    }
 
-    // Update calculated quantities inside active variables
-    cartCount = cartCount + 1;
-    cartSubtotal = cartSubtotal + numericPrice;
-
-    // Render the updated calculations to the UI immediately
-    renderUpdatedCart();
+    // Update the master sticky checkout bar at the bottom
+    cartCountEl.innerText = totalItems;
+    cartTotalEl.innerText = `GHS ${totalCash.toFixed(2)}`;
 }
 
-// 🎨 RENDER ENGINE — Syncing internal numbers with display tags
-function renderUpdatedCart() {
-    cartCountEl.innerText = cartCount;
-    cartTotalEl.innerText = `GHS ${cartSubtotal.toFixed(2)}`;
-}
+// 🛠️ 4. STATE MUTATION ENGINE — Modifying data safely when clicked
+productGrid.addEventListener('click', (event) => {
+    const target = event.target;
+    
+    // Check if the clicked element is a plus or minus button
+    const isPlus = target.classList.contains('plus-btn');
+    const isMinus = target.classList.contains('minus-btn');
+    
+    // If it's neither, ignore the click completely
+    if (!isPlus && !isMinus) return;
 
-// 🚀 EVENT SYSTEM CONNECTIONS
-// Listening to the layout container for any child item clicks using Event Delegation
-productGrid.addEventListener('click', handleAddToCart);
+    // Find the nearest parent product card to see WHICH item was tapped
+    const productCard = target.closest('.product-card');
+    const productId = productCard.getAttribute('data-id');
 
-// Connecting Checkout Control System to the External WhatsApp Messaging Network
+    // Mutate the quantity value inside our central cartState brain
+    if (isPlus) {
+        cartState[productId].quantity += 1;
+    } else if (isMinus) {
+        // Prevent negative quantities (don't let quantities drop below 0!)
+        if (cartState[productId].quantity > 0) {
+            cartState[productId].quantity -= 1;
+        }
+    }
+
+    // Immediately run the render engine to sync the screen with our updated brain!
+    renderUI();
+});
+
+// 🚀 5. OUTBOUND WHATSAPP ROUTING INTEGRATION
 checkoutBtn.addEventListener('click', () => {
-    // Throw an absolute warning notice if the cart holds zero transactions
-    if (cartCount === 0) {
-        alert("Chale, your shopping cart is empty! Add an item first.");
+    let orderLines = [];
+    let grandTotal = 0;
+
+    // Compile a list of items that have a quantity greater than zero
+    for (const key in cartState) {
+        const item = cartState[key];
+        if (item.quantity > 0) {
+            const lineTotal = item.quantity * item.price;
+            orderLines.push(`• ${item.quantity}x ${item.name} (GHS ${lineTotal})`);
+            grandTotal += lineTotal;
+        }
+    }
+
+    // If they haven't picked anything, throw an alert box
+    if (orderLines.length === 0) {
+        alert("Chale, your cart is empty! Press + on an item to add it.");
         return;
     }
 
-    // Official receiving business contact phone layout (No spaces or plus characters)
-    const vendorPhone = "233243217680"; 
+    // Your production MTN vendor destination path
+    const vendorPhone = "233243217680";
 
-    // Construct the explicit multi-line dynamic string layout context
-    const orderMessage = `🚀 *NEW UCP STORE ORDER*
-----------------------------
-👋 Hello Vendor, I want to place an order:
+    // Build the clean itemized text block layout
+    const orderMessage = `🚀 *NEW UCP DIGITAL HUB ORDER*
+----------------------------------
+👋 Hello Vendor, I want to buy:
 
-🛒 Total Items: ${cartCount}
-💰 Total Amount: GHS ${cartSubtotal.toFixed(2)}
+${orderLines.join('\n')}
 
-✅ Please confirm availability so I can process payment!`;
+💰 *Grand Total:* GHS ${grandTotal.toFixed(2)}
+----------------------------------
+✅ Please check stock availability for immediate delivery!`;
 
-    // Safely transform plain formatting symbols into web-safe percent hex strings
+    // Safely encode symbols, spaces, and breaks into safe hex web packets
     const encodedMessage = encodeURIComponent(orderMessage);
-
-    // Assembly path leading straight to the WhatsApp network protocol gateway
-    const whatsAppApiUrl = `https://wa.me/${vendorPhone}?text=${encodedMessage}`;
-
-    // Direct the viewport to launch the compiled routing endpoint string
-    window.location.href = whatsAppApiUrl;
+    
+    // Launch out to the WhatsApp communication layer
+    window.location.href = `https://wa.me/${vendorPhone}?text=${encodedMessage}`;
 });

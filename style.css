@@ -110,3 +110,42 @@ h2 {
     font-weight: bold;
     cursor: pointer;
 }
+
+/* 🔢 INTERACTIVE QUANTITY CONTROLS */
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f1f2f6;
+    border-radius: 8px;
+    padding: 4px;
+    margin-top: 10px;
+}
+
+.qty-btn {
+    background-color: #fff;
+    color: #111;
+    border: 1px solid #ddd;
+    width: 35px;
+    height: 35px;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.qty-btn:active {
+    background-color: #eee;
+}
+
+.qty-count {
+    font-size: 1.1rem;
+    font-weight: bold;
+    min-width: 30px;
+    text-align: center;
+}
+

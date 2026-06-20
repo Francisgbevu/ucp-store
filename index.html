@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Makola Digital Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Makola Digital Hub</h1>
+        <p>Direct vendor dispatch. Localized WhatsApp checkout automation.</p>
+    </header>
+
+    <main>
+        <h2>Featured Inventory</h2>
+        <div id="product-grid" class="product-grid">
+            <div class="product-card">
+                <div class="product-image-placeholder"></div>
+                <h3>Premium Canvas Sneaker</h3>
+                <p class="price">GHS 350.00</p>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+            <div class="product-card">
+                <div class="product-image-placeholder"></div>
+                <h3>Vintage Graphic Tee</h3>
+                <p class="price">GHS 180.00</p>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="checkout-bar">
+        <div class="cart-summary">
+            Items Selected: <span id="cart-count">0</span> | 
+            Total: <span id="cart-total">GHS 0.00</span>
+        </div>
+        <button id="checkout-btn" class="checkout-btn">Review WhatsApp Order</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

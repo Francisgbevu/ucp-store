@@ -1,22 +1,30 @@
-// ⚡ 1. DOM SELECTORS — Pinpointing our display and input nodes
+// ⚡ 1. DOM SELECTORS
 const cartCountEl = document.getElementById('cart-count');
 const cartTotalEl = document.getElementById('cart-total');
 const productGrid = document.getElementById('product-grid');
 const checkoutBtn = document.getElementById('checkout-btn');
-
-// New Input Elements and Error Node Selectors
 const nameInput = document.getElementById('customer-name');
 const addressInput = document.getElementById('customer-address');
 const nameError = document.getElementById('name-error');
 const addressError = document.getElementById('address-error');
 
-// 📊 2. APPLICATION STATE
-const cartState = {
+// 📊 2. APPLICATION STATE (WITH LOCALSTORAGE RESTORATION)
+// We check if an old cart exists in memory. If not, we fall back to our default empty setup.
+const defaultState = {
     sneaker: { name: "Premium Canvas Sneaker", price: 350.00, quantity: 0 },
     tee: { name: "Vintage Graphic Tee", price: 180.00, quantity: 0 }
 };
 
-// 🎨 3. RENDER ENGINE — Syncs memory quantities to the screen visual tags
+let cartState = JSON.parse(localStorage.getItem('ucp_cart_state')) || defaultState;
+
+// 💾 3. PERSISTENCE ENGINE — Saves active memory states into the browser storage
+function saveStateToStorage() {
+    localStorage.setItem('ucp_cart_state', JSON.stringify(cartState));
+    localStorage.setItem('ucp_customer_name', nameInput.value);
+    localStorage.setItem('ucp_customer_address', addressInput.value);
+}
+
+// 🎨 4. RENDER ENGINE — Syncs memory data onto display layers
 function renderUI() {
     let totalItems = 0;
     let totalCash = 0;
@@ -36,7 +44,7 @@ function renderUI() {
     cartTotalEl.innerText = `GHS ${totalCash.toFixed(2)}`;
 }
 
-// 🛠️ 4. STATE MUTATION ENGINE — Handles plus and minus clicks safely
+// 🛠️ 5. STATE MUTATION ENGINE
 productGrid.addEventListener('click', (event) => {
     const target = event.target;
     const isPlus = target.classList.contains('plus-btn');
@@ -55,16 +63,20 @@ productGrid.addEventListener('click', (event) => {
         }
     }
 
+    // Save changes to disk and redraw interface instantly
+    saveStateToStorage();
     renderUI();
 });
 
-// 🚀 5. ADVANCED VALIDATION & OUTBOUND WHATSAPP ROUTING
+// ⌨️ LIVE INPUT INPUT TRACKING — Save form entries while the user types
+nameInput.addEventListener('input', saveStateToStorage);
+addressInput.addEventListener('input', saveStateToStorage);
+
+// 🚀 6. ADVANCED VALIDATION & OUTBOUND WHATSAPP ROUTING
 checkoutBtn.addEventListener('click', () => {
-    // Clear out any old error messages from previous attempts
     nameError.innerText = "";
     addressError.innerText = "";
 
-    // --- 🔍 STEP A: SANITIZE AND VALIDATE USER INPUTS ---
     const customerName = nameInput.value.trim();
     const customerAddress = addressInput.value.trim();
     let isFormValid = true;
@@ -73,13 +85,11 @@ checkoutBtn.addEventListener('click', () => {
         nameError.innerText = "Chale, please enter your name for the invoice!";
         isFormValid = false;
     }
-
     if (customerAddress === "") {
         addressError.innerText = "Delivery location cannot be blank!";
         isFormValid = false;
     }
 
-    // --- 🛒 STEP B: VERIFY INVENTORY ITEMS IN CART ---
     let orderLines = [];
     let grandTotal = 0;
 
@@ -97,12 +107,9 @@ checkoutBtn.addEventListener('click', () => {
         return;
     }
 
-    // If any input validation failed, STOP execution immediately and don't send to WhatsApp
     if (!isFormValid) return;
 
-    // --- 📱 STEP C: ASSEMBLE ADVANCED STRING INVOICE ---
     const vendorPhone = "233243217680";
-
     const orderMessage = `🚀 *NEW UCP DIGITAL HUB ORDER*
 ----------------------------------
 👤 *CUSTOMER DETAILS:*
@@ -116,9 +123,13 @@ ${orderLines.join('\n')}
 ----------------------------------
 ✅ Please confirm stock availability so I can process payment!`;
 
-    // Safely transform your template string into a web-safe hex payload URL
     const encodedMessage = encodeURIComponent(orderMessage);
-    
-    // Fire out into the live WhatsApp API network link gateway
     window.location.href = `https://wa.me/${vendorPhone}?text=${encodedMessage}`;
+});
+
+// 🏁 7. INITIALIZATION CALL — Restore form fields and fire interface redraw on initial startup
+window.addEventListener('DOMContentLoaded', () => {
+    nameInput.value = localStorage.getItem('ucp_customer_name') || "";
+    addressInput.value = localStorage.getItem('ucp_customer_address') || "";
+    renderUI();
 });

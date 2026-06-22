@@ -259,3 +259,37 @@ h2 {
     background-color: #44bd32;
     transform: scale(0.98);
 }
+
+/* 🔄 RESET ENGINE ACTIONS */
+.form-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f1f2f6;
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+}
+
+/* Clear legacy border rules from the standard header */
+.checkout-form-section h3 {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.clear-btn {
+    background: none;
+    border: none;
+    color: #e84118; /* Alert crimson hue */
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.clear-btn:active {
+    background: rgba(232, 65, 24, 0.08);
+}
+

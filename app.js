@@ -27,18 +27,23 @@ function saveStateToStorage() {
 }
 
 // 🎨 4. RENDER ENGINE — Syncs memory data onto display layers
+// 🎨 4. OPTIMIZED RENDER ENGINE — Syncs memory data onto display layers
 function renderUI() {
-    let totalItems = 0;
-    let totalCash = 0;
+    // Convert our state object into an array and fold it to calculate total quantities [1]
+    const totalItems = Object.values(cartState).reduce((acc, item) => {
+        return acc + item.quantity;
+    }, 0);
 
+    // Fold the array to calculate the precise monetary subtotal sum [4, 1]
+    const totalCash = Object.values(cartState).reduce((acc, item) => {
+        return acc + (item.quantity * item.price);
+    }, 0);
+
+    // Loop strictly to update individual quantity indicators on the card viewports
     for (const key in cartState) {
-        const item = cartState[key];
-        totalItems += item.quantity;
-        totalCash += item.quantity * item.price;
-
         const card = document.querySelector(`[data-id="${key}"]`);
         if (card) {
-            card.querySelector('.qty-count').innerText = item.quantity;
+            card.querySelector('.qty-count').innerText = cartState[key].quantity;
         }
     }
 
@@ -46,6 +51,8 @@ function renderUI() {
     cartTotalEl.innerText = `GHS ${totalCash.toFixed(2)}`;
 }
 
+
+    
 // 🛠️ 5. STATE MUTATION ENGINE
 productGrid.addEventListener('click', (event) => {
     const target = event.target;
@@ -91,24 +98,21 @@ checkoutBtn.addEventListener('click', () => {
         isFormValid = false;
     }
 
-    let orderLines = [];
-    let grandTotal = 0;
+    // Filter and compile items that have a quantity greater than zero
+    const activeItems = Object.values(cartState).filter(item => item.quantity > 0);
 
-    for (const key in cartState) {
-        const item = cartState[key];
-        if (item.quantity > 0) {
-            const lineTotal = item.quantity * item.price;
-            orderLines.push(`• ${item.quantity}x ${item.name} (GHS ${lineTotal})`);
-            grandTotal += lineTotal;
-        }
-    }
-
-    if (orderLines.length === 0) {
+    if (activeItems.length === 0) {
         alert("Your shopping cart is empty! Press + on an item first.");
         return;
     }
 
     if (!isFormValid) return;
+
+    // Use.reduce() to cleanly calculate our grand total price in one line [4, 1]
+    const grandTotal = activeItems.reduce((acc, item) => acc + (item.quantity * item.price), 0);
+
+    // Map out our formatted invoice items lines
+    const orderLines = activeItems.map(item => `• ${item.quantity}x ${item.name} (GHS ${item.quantity * item.price})`);
 
     const vendorPhone = "233243217680";
     const orderMessage = `🚀 *NEW UCP DIGITAL HUB ORDER*
@@ -126,23 +130,17 @@ ${orderLines.join('\n')}
 
     const encodedMessage = encodeURIComponent(orderMessage);
     
-    // --- 🔄 CHECKOUT LIFECYCLE FLUSH ---
-    // Clear out the browser's disk caches right before leaving so they return to a fresh slate!
+    // CHECKOUT LIFECYCLE FLUSH
     localStorage.removeItem('ucp_cart_state');
     localStorage.removeItem('ucp_customer_name');
-    
-    // Reset our active runtime brain object back to 0s
     cartState = JSON.parse(JSON.stringify(defaultState));
-    
-    // Clear the active screen text fields instantly
     nameInput.value = "";
-    
-    // Redraw the interface right before the window moves away
+    addressInput.value = "";
     renderUI();
 
-    // Fire out into the live WhatsApp API gateway
     window.location.href = `https://wa.me/${vendorPhone}?text=${encodedMessage}`;
 });
+
 
 // 🔄 7. MANUAL CACHE RESET EVENT HANDLER
 clearCartBtn.addEventListener('click', () => {

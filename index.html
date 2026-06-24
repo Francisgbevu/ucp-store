@@ -12,11 +12,14 @@
         <p>Direct vendor dispatch. Localized WhatsApp checkout automation.</p>
     </header>
 
-        <main>
+    <main>
         <h2>Featured Inventory</h2>
         <div id="product-grid" class="product-grid">
+            
             <div class="product-card" data-id="sneaker" data-price="350.00" data-name="Premium Canvas Sneaker">
-                <div class="product-image-placeholder"></div>
+                <div class="product-image-placeholder">
+                    <img src="assets/sneaker.png" alt="Premium Canvas Sneaker">
+                </div>
                 <h3>Premium Canvas Sneaker</h3>
                 <p class="price">GHS 350.00</p>
                 
@@ -28,7 +31,9 @@
             </div>
 
             <div class="product-card" data-id="tee" data-price="180.00" data-name="Vintage Graphic Tee">
-                <div class="product-image-placeholder"></div>
+                <div class="product-image-placeholder">
+                    <img src="assets/tee.png" alt="Vintage Graphic Tee">
+                </div>
                 <h3>Vintage Graphic Tee</h3>
                 <p class="price">GHS 180.00</p>
                 
@@ -38,19 +43,11 @@
                     <button class="qty-btn plus-btn">+</button>
                 </div>
             </div>
+
         </div>
     </main>
 
-
-    <div class="checkout-bar">
-        <div class="cart-summary">
-            Items Selected: <span id="cart-count">0</span> | 
-            Total: <span id="cart-total">GHS 0.00</span>
-        </div>
-        <button id="checkout-btn" class="checkout-btn">Review WhatsApp Order</button>
-    </div>
-        <!-- 📋 NEW USER CHECKOUT DETAILS FORM -->
-        <section class="checkout-form-section">
+    <section class="checkout-form-section">
         <div class="form-header-row">
             <h3>Delivery Details</h3>
             <button type="button" id="clear-cart-btn" class="clear-btn">Clear Form & Cart</button>
@@ -63,12 +60,18 @@
         </div>
         <div class="form-group">
             <label for="customer-address">Delivery Address / Location:</label>
-            <input type="text" id="customer-address" placeholder="e.g., Makola Market, Block C" autocomplete="off">
+            <input type="text" id="customer-address" placeholder="e.g., Adenta Rosa Rosa Bus Stop" autocomplete="off">
             <span class="error-msg" id="address-error"></span>
         </div>
     </section>
 
-
+    <div class="checkout-bar">
+        <div class="cart-summary">
+            Items Selected: <span id="cart-count">0</span> | 
+            Total: <span id="cart-total">GHS 0.00</span>
+        </div>
+        <button id="checkout-btn" class="checkout-btn">Review WhatsApp Order</button>
+    </div>
 
     <script src="app.js"></script>
 </body>
